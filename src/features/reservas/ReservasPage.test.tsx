@@ -6,6 +6,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { createFakeRestBackend } from "@/test/fakeApi";
 import { Reservas } from "./ReservasPage";
+import { ReservaRow } from "./components/ReservaRow";
 import { createTestQueryClient } from "@/test/queryWrapper";
 import { AuthProvider } from "@/context/AuthContext";
 import { ROLES } from "@/services/core/roles";
@@ -349,6 +350,55 @@ describe("features/reservas", () => {
     // El resto de la fila sigue disponible — solo se oculta la acción de eliminar.
     expect(
       screen.getByLabelText("Ver detalle de la reserva"),
+    ).toBeInTheDocument();
+  });
+
+  it("muestra el motivo del rechazo en la fila de la reserva", () => {
+    render(
+      <ReservaRow
+        reserva={
+          {
+            id: "r-9",
+            vehiculoId: "1",
+            celdaId: "1",
+            conductorId: "1",
+            fechaReserva: "2030-01-02",
+            horaInicio: "08:00",
+            horaFin: "10:00",
+            estado: "rechazada",
+            motivo: "",
+            motivoRechazo: "No hay disponibilidad en ese horario.",
+            tipoReserva: "visitante",
+          } as any
+        }
+        vehiculo={
+          {
+            id: "1",
+            placa: "ABC123",
+            marca: "Chevrolet",
+            modelo: "Spark",
+          } as any
+        }
+        celda={{ id: "1", numero: "C-001" } as any}
+        usuario={
+          {
+            id: "1",
+            nombre: "Conductor Uno",
+            tipoUsuarioNombre: "Aprendiz",
+            numeroDocumento: "123",
+          } as any
+        }
+        parqueadero={{ id: "1", nombre: "PQ Uno" } as any}
+        canDelete={false}
+        onView={() => {}}
+        onDelete={() => {}}
+      />,
+    );
+
+    expect(
+      screen.getByText(
+        "Motivo del rechazo: No hay disponibilidad en ese horario.",
+      ),
     ).toBeInTheDocument();
   });
 

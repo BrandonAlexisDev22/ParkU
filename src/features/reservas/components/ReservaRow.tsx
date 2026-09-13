@@ -94,6 +94,19 @@ export function ReservaRow({
           <div style={{ fontSize: 10, color: C.textLight }}>
             {vehiculo?.marca} {vehiculo?.modelo}
           </div>
+          {reserva.estado === "rechazada" && reserva.motivoRechazo && (
+            <div
+              style={{
+                marginTop: 4,
+                fontSize: 9,
+                color: C.danger,
+                fontWeight: 700,
+                lineHeight: 1.4,
+              }}
+            >
+              Motivo del rechazo: {reserva.motivoRechazo}
+            </div>
+          )}
         </div>
       </div>
 
