@@ -17,7 +17,8 @@ import { ESTADO_CONFIG, todayStr } from "../lib/constants";
 
 const C = theme;
 
-export const RESERVA_GRID_COLUMNS = "minmax(180px,1fr) minmax(160px,1fr) 120px minmax(160px,1fr) 180px 110px 100px";
+export const RESERVA_GRID_COLUMNS =
+  "minmax(180px,1fr) minmax(160px,1fr) 120px minmax(160px,1fr) 180px 110px 100px";
 
 interface ReservaRowProps {
   reserva: Reserva;
@@ -39,9 +40,22 @@ interface ReservaRowProps {
 }
 
 /** Una fila de la tabla de reservas: vehículo, conductor, ubicación, horario, fecha, estado y acciones. */
-export function ReservaRow({ reserva, vehiculo, celda, usuario, parqueadero, canDelete, onView, onDelete, canCancel = false, onCancel }: ReservaRowProps) {
+export function ReservaRow({
+  reserva,
+  vehiculo,
+  celda,
+  usuario,
+  parqueadero,
+  canDelete,
+  onView,
+  onDelete,
+  canCancel = false,
+  onCancel,
+}: ReservaRowProps) {
   const cfg = ESTADO_CONFIG[reserva.estado];
-  const esPasada = reserva.fechaReserva < todayStr() && !["completada", "cancelada", "rechazada"].includes(reserva.estado);
+  const esPasada =
+    reserva.fechaReserva < todayStr() &&
+    !["completada", "cancelada", "rechazada"].includes(reserva.estado);
   // Eliminar borra el registro por completo — solo tiene sentido mientras la reserva sigue
   // "pendiente" (aún no gestionada). Una ya aceptada/rechazada/completada/cancelada es
   // historial y debe conservarse, así que el botón se oculta aunque el rol sí pueda eliminar.
@@ -60,28 +74,60 @@ export function ReservaRow({ reserva, vehiculo, celda, usuario, parqueadero, can
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(57,169,0,.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: 10,
+            background: "rgba(57,169,0,.1)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <Car size={16} color={C.primary} />
         </div>
         <div>
-          <div style={{ fontWeight: 800, color: C.text }}>{vehiculo?.placa || "—"}</div>
-          <div style={{ fontSize: 10, color: C.textLight }}>{vehiculo?.marca} {vehiculo?.modelo}</div>
+          <div style={{ fontWeight: 800, color: C.text }}>
+            {vehiculo?.placa || "—"}
+          </div>
+          <div style={{ fontSize: 10, color: C.textLight }}>
+            {vehiculo?.marca} {vehiculo?.modelo}
+          </div>
         </div>
       </div>
 
       <div>
         {usuario ? (
           <>
-            <div style={{ fontWeight: 600, color: C.text }}>{usuario.nombre}</div>
-            <div style={{ fontSize: 10, color: C.textLight }}>{usuario.numeroDocumento}</div>
+            <div style={{ fontWeight: 600, color: C.text }}>
+              {usuario.nombre}
+            </div>
+            <div style={{ fontSize: 10, color: C.textLight }}>
+              {usuario.tipoUsuarioNombre || "Sin tipo"} ·{" "}
+              {usuario.numeroDocumento || "—"}
+            </div>
           </>
         ) : (
-          <span style={{ color: C.textLight, fontSize: 11 }}>Sin conductor</span>
+          <span style={{ color: C.textLight, fontSize: 11 }}>
+            Sin conductor
+          </span>
         )}
       </div>
 
       <div>
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 8px", borderRadius: 8, background: "#F1F5F9", fontSize: 11, fontWeight: 600 }}>
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 4,
+            padding: "2px 8px",
+            borderRadius: 8,
+            background: "#F1F5F9",
+            fontSize: 11,
+            fontWeight: 600,
+          }}
+        >
           <MapPin size={10} color={C.primary} />
           Celda {celda?.numero || "—"}
         </div>
@@ -101,23 +147,50 @@ export function ReservaRow({ reserva, vehiculo, celda, usuario, parqueadero, can
       <div>
         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
           <Calendar size={10} color={C.textLight} />
-          <span style={{ fontSize: 11, color: C.text }}>{reserva.fechaReserva}</span>
+          <span style={{ fontSize: 11, color: C.text }}>
+            {reserva.fechaReserva}
+          </span>
         </div>
         {esPasada && (
-          <div style={{ display: "flex", alignItems: "center", gap: 3, marginTop: 2 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 3,
+              marginTop: 2,
+            }}
+          >
             <AlertCircle size={9} color={C.danger} />
-            <span style={{ fontSize: 9, color: C.danger, fontWeight: 700 }}>Vencida</span>
+            <span style={{ fontSize: 9, color: C.danger, fontWeight: 700 }}>
+              Vencida
+            </span>
           </div>
         )}
       </div>
 
       <div>
-        <span style={{
-          display: "inline-flex", alignItems: "center", gap: 4,
-          padding: "2px 8px", borderRadius: 999, fontSize: 10, fontWeight: 700,
-          background: cfg.bg, color: cfg.text, border: `1px solid ${cfg.border}`,
-        }}>
-          <span style={{ width: 6, height: 6, borderRadius: "50%", background: cfg.dot }} />
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 4,
+            padding: "2px 8px",
+            borderRadius: 999,
+            fontSize: 10,
+            fontWeight: 700,
+            background: cfg.bg,
+            color: cfg.text,
+            border: `1px solid ${cfg.border}`,
+          }}
+        >
+          <span
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: "50%",
+              background: cfg.dot,
+            }}
+          />
           {cfg.label}
         </span>
       </div>
@@ -128,7 +201,18 @@ export function ReservaRow({ reserva, vehiculo, celda, usuario, parqueadero, can
           title="Ver detalle"
           aria-label="Ver detalle de la reserva"
           onClick={onView}
-          style={{ width: 28, height: 28, borderRadius: 7, border: "none", background: "transparent", color: C.textLight, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+          style={{
+            width: 28,
+            height: 28,
+            borderRadius: 7,
+            border: "none",
+            background: "transparent",
+            color: C.textLight,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
           <Eye size={13} />
         </button>
@@ -138,7 +222,18 @@ export function ReservaRow({ reserva, vehiculo, celda, usuario, parqueadero, can
             title="Cancelar reserva"
             aria-label={`Cancelar la reserva de ${vehiculo?.placa ?? "este vehículo"}`}
             onClick={onCancel}
-            style={{ width: 28, height: 28, borderRadius: 7, border: "none", background: "transparent", color: "#B45309", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: 7,
+              border: "none",
+              background: "transparent",
+              color: "#B45309",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
             <Ban size={13} />
           </button>
@@ -149,7 +244,18 @@ export function ReservaRow({ reserva, vehiculo, celda, usuario, parqueadero, can
             title="Eliminar"
             aria-label="Eliminar reserva"
             onClick={onDelete}
-            style={{ width: 28, height: 28, borderRadius: 7, border: "none", background: "transparent", color: "#EF4444", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: 7,
+              border: "none",
+              background: "transparent",
+              color: "#EF4444",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
             <Trash2 size={13} />
           </button>

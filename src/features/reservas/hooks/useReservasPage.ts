@@ -215,8 +215,8 @@ export function useReservasPage() {
 
       toast.success(
         otrasEnConflicto.length > 0
-          ? `Solicitud aceptada — la celda queda reservada. ${otrasEnConflicto.length} solicitud(es) en conflicto se rechazaron automáticamente.`
-          : "Solicitud aceptada — la celda queda reservada."
+          ? `Solicitud aceptada — la celda queda reservada. La información llegará al correo del usuario. ${otrasEnConflicto.length} solicitud(es) en conflicto se rechazaron automáticamente.`
+          : "Solicitud aceptada — la celda queda reservada. La información llegará al correo del usuario."
       );
     } catch (error) {
       // El toast de error ya lo muestra el manejador centralizado de mutaciones

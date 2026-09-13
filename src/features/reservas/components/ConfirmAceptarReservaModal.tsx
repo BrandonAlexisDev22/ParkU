@@ -61,7 +61,8 @@ export function ConfirmAceptarReservaModal({
           </h3>
           <p style={{ fontSize: 12, color: C.textLight, marginTop: 6 }}>
             Vas a aceptar la solicitud de reserva. Revisa los datos del
-            solicitante antes de confirmar.
+            solicitante antes de confirmar. La información llegará al correo del
+            usuario.
           </p>
         </div>
       </div>
@@ -109,6 +110,10 @@ export function ConfirmAceptarReservaModal({
             <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
               <Phone size={14} color={C.primary} />
               {usuario.numeroTelefonico || "Sin teléfono"}
+            </div>
+            <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+              <Building size={14} color={C.primary} />
+              {usuario.tipoUsuarioNombre || "Sin tipo"}
             </div>
             <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
               <Building size={14} color={C.primary} />

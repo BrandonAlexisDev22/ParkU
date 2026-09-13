@@ -267,6 +267,15 @@ export function Reservas() {
                           alignItems: "center",
                         }}
                       >
+                        {usuario.tipoUsuarioNombre || "Sin tipo"}
+                      </span>
+                      <span
+                        style={{
+                          display: "flex",
+                          gap: 6,
+                          alignItems: "center",
+                        }}
+                      >
                         {usuario.centroFormacion || "Sin centro"}
                       </span>
                     </div>
