@@ -468,9 +468,21 @@ export const ParqueaderosTable = memo(
                       >
                         {Object.entries(TIPO_CELDA_CONFIG).map(
                           ([tipo, cfg]) => {
-                            const total = celdasPq.filter(
-                              (c) => c.tipo === tipo,
-                            ).length;
+                            let total = 0;
+                            if (tipo === "movilidad reducida") {
+                              total =
+                                celdasPq.filter(esCeldaPreferencial).length;
+                            } else if (tipo === "carro") {
+                              // Excluir las plazas de movilidad reducida del conteo de "carro"
+                              total = celdasPq.filter(
+                                (c) =>
+                                  c.tipo === tipo && !esCeldaPreferencial(c),
+                              ).length;
+                            } else {
+                              total = celdasPq.filter(
+                                (c) => c.tipo === tipo,
+                              ).length;
+                            }
                             if (!total) return null;
                             const Icon = cfg.icon;
                             return (
