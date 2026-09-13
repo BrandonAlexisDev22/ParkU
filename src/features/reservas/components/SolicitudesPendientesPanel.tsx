@@ -255,6 +255,16 @@ export function SolicitudesPendientesPanel({
                         <Phone size={12} color={C.primary} />
                         {conductor.numeroTelefonico || "Sin teléfono"}
                       </span>
+                      <span
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 6,
+                        }}
+                      >
+                        <Building size={12} color={C.primary} />
+                        {conductor.tipoUsuarioNombre || "Sin tipo"}
+                      </span>
                     </div>
 
                     {expandida === reserva.id && (
@@ -280,6 +290,20 @@ export function SolicitudesPendientesPanel({
                           <span>
                             {conductor.tipoDocumento || "—"} ·{" "}
                             {conductor.numeroDocumento || "Sin documento"}
+                          </span>
+                        </div>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 6,
+                            fontSize: 10.5,
+                            color: C.textLight,
+                          }}
+                        >
+                          <Building size={12} color={C.primary} />{" "}
+                          <span>
+                            {conductor.tipoUsuarioNombre || "Sin tipo"}
                           </span>
                         </div>
                         <div

@@ -416,6 +416,7 @@ describe("features/reservas", () => {
     expect(screen.getByText("Conductor Uno")).toBeInTheDocument();
     expect(screen.getByText("conductor1@sena.edu.co")).toBeInTheDocument();
     expect(screen.getByText("3201234567")).toBeInTheDocument();
+    expect(screen.getByText("Aprendiz")).toBeInTheDocument();
   });
 
   it("avisa por correo cuando una reserva se acepta", async () => {
