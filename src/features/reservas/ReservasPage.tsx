@@ -17,6 +17,7 @@ import { ReservasTable } from "./components/ReservasTable";
 import { ReservaViewModal } from "./components/ReservaViewModal";
 import { ConfirmDeleteReservaModal } from "./components/ConfirmDeleteReservaModal";
 import { MotivoReservaModal } from "./components/MotivoReservaModal";
+import { ConfirmAceptarReservaModal } from "./components/ConfirmAceptarReservaModal";
 import { SolicitudesPendientesPanel } from "./components/SolicitudesPendientesPanel";
 import { SolicitarReservaModal } from "./components/SolicitarReservaModal";
 
@@ -85,7 +86,7 @@ export function Reservas() {
             getCelda={p.getCelda}
             getParqueadero={p.getParqueadero}
             getConductorReserva={p.getConductorReserva}
-            onAceptar={p.aceptarSolicitud}
+            onAceptar={p.handleAceptar}
             onRechazar={p.handleRechazar}
           />
         )}
@@ -192,15 +193,126 @@ export function Reservas() {
         onClose={() => p.setConfirmRechazar(null)}
         maxWidth={420}
       >
-        {p.confirmRechazar && (
-          <MotivoReservaModal
-            accion="rechazar"
-            placa={p.getVehiculo(p.confirmRechazar.vehiculoId)?.placa || "—"}
-            fecha={p.confirmRechazar.fechaReserva}
-            onCancel={() => p.setConfirmRechazar(null)}
-            onConfirm={p.confirmRechazarAction}
-          />
-        )}
+        {p.confirmRechazar &&
+          (() => {
+            const veh = p.getVehiculo(p.confirmRechazar!.vehiculoId);
+            const cel = p.getCelda(p.confirmRechazar!.celdaId);
+            const usuario = p.getConductorReserva(p.confirmRechazar!);
+            const pq = cel ? p.getParqueadero(cel.parqueaderoId) : undefined;
+            return (
+              <>
+                {usuario ? (
+                  <div
+                    style={{
+                      padding: 12,
+                      borderRadius: 10,
+                      background: "#F8FAFC",
+                      border: `1px solid ${C.border}`,
+                      margin: "0 0 12px 0",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: 10,
+                        alignItems: "center",
+                        marginBottom: 8,
+                      }}
+                    >
+                      <span style={{ fontWeight: 800, color: C.text }}>
+                        {usuario.nombre}
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: 12,
+                        flexWrap: "wrap",
+                        color: C.textLight,
+                        fontSize: 13,
+                      }}
+                    >
+                      <span
+                        style={{
+                          display: "flex",
+                          gap: 6,
+                          alignItems: "center",
+                        }}
+                      >
+                        {usuario.tipoDocumento || "—"} ·{" "}
+                        {usuario.numeroDocumento || "—"}
+                      </span>
+                      <span
+                        style={{
+                          display: "flex",
+                          gap: 6,
+                          alignItems: "center",
+                        }}
+                      >
+                        {usuario.correo || "Sin correo"}
+                      </span>
+                      <span
+                        style={{
+                          display: "flex",
+                          gap: 6,
+                          alignItems: "center",
+                        }}
+                      >
+                        {usuario.numeroTelefonico || "Sin teléfono"}
+                      </span>
+                      <span
+                        style={{
+                          display: "flex",
+                          gap: 6,
+                          alignItems: "center",
+                        }}
+                      >
+                        {usuario.centroFormacion || "Sin centro"}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ marginBottom: 12, color: C.textLight }}>
+                    Conductor sin datos
+                  </div>
+                )}
+                <MotivoReservaModal
+                  accion="rechazar"
+                  placa={
+                    p.getVehiculo(p.confirmRechazar.vehiculoId)?.placa || "—"
+                  }
+                  fecha={p.confirmRechazar.fechaReserva}
+                  onCancel={() => p.setConfirmRechazar(null)}
+                  onConfirm={p.confirmRechazarAction}
+                />
+              </>
+            );
+          })()}
+      </Modal>
+
+      <Modal
+        open={!!p.confirmAceptar}
+        onClose={() => p.setConfirmAceptar(null)}
+        maxWidth={520}
+      >
+        {p.confirmAceptar &&
+          (() => {
+            const veh = p.getVehiculo(p.confirmAceptar!.vehiculoId);
+            const cel = p.getCelda(p.confirmAceptar!.celdaId);
+            const usuario = p.getConductorReserva(p.confirmAceptar!);
+            const pq = cel ? p.getParqueadero(cel.parqueaderoId) : undefined;
+            return (
+              <ConfirmAceptarReservaModal
+                reserva={p.confirmAceptar!}
+                usuario={usuario}
+                vehiculo={veh}
+                celda={cel}
+                parqueadero={pq}
+                onCancel={() => p.setConfirmAceptar(null)}
+                onConfirm={p.confirmAceptarAction}
+              />
+            );
+          })()}
       </Modal>
 
       <Modal

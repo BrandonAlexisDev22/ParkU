@@ -59,6 +59,7 @@ export function useReservasPage() {
   const [filterEstado, setFilterEstado] = useState<"todos" | EstadoReserva>("todos");
   const [confirmDelete, setConfirmDelete] = useState<Reserva | null>(null);
   const [confirmRechazar, setConfirmRechazar] = useState<Reserva | null>(null);
+  const [confirmAceptar, setConfirmAceptar] = useState<Reserva | null>(null);
   const [confirmCancelar, setConfirmCancelar] = useState<Reserva | null>(null);
 
   const getVehiculo = (id: string) => vehiculos.find((v) => v.id === id);
@@ -287,14 +288,28 @@ export function useReservasPage() {
     }
   };
 
+  const handleAceptar = (reserva: Reserva) => setConfirmAceptar(reserva);
+
+  const confirmAceptarAction = async () => {
+    if (!confirmAceptar) return;
+    try {
+      await aceptarSolicitud(confirmAceptar);
+      setConfirmAceptar(null);
+    } catch (error) {
+      console.error("Error confirming accept reserva:", error);
+    }
+  };
+
   return {
     reservas, viewOpen, setViewOpen, viewingReserva, setViewingReserva,
     search, setSearch, filterEstado, setFilterEstado, confirmDelete, setConfirmDelete,
     confirmRechazar, setConfirmRechazar,
+    confirmAceptar, setConfirmAceptar,
     getVehiculo, getCelda, getParqueadero, getConductorReserva,
     counts, filteredReservas, handleDelete, confirmDeleteAction,
     puedeCancelar, handleCancelar, confirmCancelar, setConfirmCancelar, confirmCancelarAction,
     puedeGestionarSolicitudes, solicitudesPendientes, aceptarSolicitud, handleRechazar, confirmRechazarAction,
+    handleAceptar, confirmAceptarAction,
     miConductorId, celdas, parqueaderos, vehiculos, controlesSalida, reservasTodas,
     activeFiltersCount, clearFilters, isLoading,
   };
