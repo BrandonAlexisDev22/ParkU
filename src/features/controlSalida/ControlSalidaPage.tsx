@@ -54,11 +54,14 @@ export function ControlSalidaPage() {
             getCelda={p.getCelda}
             getUsuarioConductor={p.getUsuarioConductor}
             getParqueadero={p.getParqueadero}
+            esConductor={user?.rol === ROLES.CONDUCTOR}
             onVerDetalle={p.verDetalle}
             onReportar={
               user?.rol !== ROLES.CONDUCTOR ? p.abrirReporteDe : undefined
             }
-            onLiberar={p.handleLiberar}
+            onLiberar={
+              user?.rol === ROLES.CONDUCTOR ? undefined : p.handleLiberar
+            }
           />
         )}
       </div>

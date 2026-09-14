@@ -76,6 +76,19 @@ describe("features/controlSalida", () => {
     expect(screen.getByText("Entrada y Salida")).toBeInTheDocument();
   });
 
+  it("no muestra columnas ni acciones administrativas para el conductor", async () => {
+    renderControlSalidaConductor();
+
+    await waitFor(() => expect(screen.getByText("ABC123")).toBeInTheDocument());
+    expect(screen.queryByText("Conductor")).not.toBeInTheDocument();
+    expect(
+      screen.queryByLabelText("Registrar salida y liberar la celda"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByLabelText(/Reportar incidente o novedad/),
+    ).not.toBeInTheDocument();
+  });
+
   it("filtra la lista al escribir una placa en el buscador (vehículo real ABC123)", async () => {
     const user = userEvent.setup();
     renderControlSalida();
