@@ -1,4 +1,3 @@
-import type { Parqueadero } from "@/services/api/parqueaderos";
 import type { Celda } from "@/services/api/celdas";
 import { theme } from "@/styles/theme";
 import { CELDA_ESTADO_CONFIG } from "../lib/constants";
@@ -9,18 +8,13 @@ const C = theme;
 
 interface IncidenteBasicFieldsProps {
   descripcion: string;
-  parqueaderoId: string;
   celdaId: string;
-  parqueaderos: Parqueadero[];
   celdasDelParqueadero: Celda[];
   celdaSeleccionada: Celda | undefined;
   ocupanteSeleccionado: { vehiculo: { placa: string }; conductorNombre?: string } | null;
   descripcionError?: string;
-  parqueaderoError?: string;
   onDescripcionChange: (value: string) => void;
   onDescripcionBlur: () => void;
-  onParqueaderoChange: (value: string) => void;
-  onParqueaderoBlur: () => void;
   onCeldaChange: (value: string) => void;
   ocupanteDeCelda: (celdaId?: string) => { vehiculo: { placa: string } } | null;
   permitirSinCelda?: boolean;
@@ -28,9 +22,9 @@ interface IncidenteBasicFieldsProps {
 
 /** Campos descripción + parqueadero + celda del formulario de incidente. */
 export function IncidenteBasicFields({
-  descripcion, parqueaderoId, celdaId, parqueaderos, celdasDelParqueadero,
-  celdaSeleccionada, ocupanteSeleccionado, descripcionError, parqueaderoError,
-  onDescripcionChange, onDescripcionBlur, onParqueaderoChange, onParqueaderoBlur, onCeldaChange, ocupanteDeCelda,
+  descripcion, celdaId, celdasDelParqueadero,
+  celdaSeleccionada, ocupanteSeleccionado, descripcionError,
+  onDescripcionChange, onDescripcionBlur, onCeldaChange, ocupanteDeCelda,
   permitirSinCelda = true,
 }: IncidenteBasicFieldsProps) {
   return (
@@ -59,23 +53,10 @@ export function IncidenteBasicFields({
         )}
       </div>
 
-      <div className="incidentes-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-        {/* Buscables: un parqueadero con cien celdas convertía el desplegable en una lista
-            imposible de recorrer, y había que reconocer el número de celda de memoria. */}
-        <SelectorBuscable
-          id="parqueadero"
-          label="Parqueadero *"
-          opciones={parqueaderos.map((p) => ({ id: p.id, titulo: p.nombre, subtitulo: p.ubicacion }))}
-          valor={parqueaderoId}
-          onChange={(id) => { onParqueaderoChange(id); onParqueaderoBlur(); }}
-          error={parqueaderoError}
-          placeholder="Buscar parqueadero…"
-          textoVacio="Ningún parqueadero coincide"
-        />
-
+      <div>
         <SelectorBuscable
           id="celda"
-          label="Celda"
+          label="Celda / vehículo estacionado"
           opciones={celdasDelParqueadero.map((c) => {
             const ocupante = ocupanteDeCelda(c.id);
             return {
@@ -86,9 +67,9 @@ export function IncidenteBasicFields({
           })}
           valor={celdaId}
           onChange={onCeldaChange}
-          deshabilitado={!parqueaderoId || celdasDelParqueadero.length === 0}
+          deshabilitado={celdasDelParqueadero.length === 0}
           placeholder="Buscar por número de celda…"
-          textoVacio={parqueaderoId ? "Ninguna celda coincide" : "Elige un parqueadero primero"}
+          textoVacio="Ninguna celda coincide"
           textoSinSeleccion={permitirSinCelda ? "Sin celda específica" : undefined}
         />
       </div>

@@ -103,15 +103,14 @@ export function Incidentes() {
           formErrors={p.formErrors}
           formInvalido={p.formInvalido}
           markTouched={p.markTouched}
-          parqueaderos={p.parqueaderos}
           vehiculos={p.vehiculos}
           usuarios={p.usuariosAsignables}
           celdasDelParqueadero={p.celdasDelParqueadero}
           celdaSeleccionada={p.celdaDe(p.formData.celdaId)}
           ocupanteSeleccionado={p.ocupanteSeleccionado}
           ocupanteDeCelda={p.ocupanteDeCelda}
-          onParqueaderoChange={p.handleParqueaderoChange}
           onCeldaChange={p.handleCeldaChange}
+          onVehiculoChange={p.handleVehiculoChange}
           onClose={p.closeForm}
           onSave={p.handleSave}
         />

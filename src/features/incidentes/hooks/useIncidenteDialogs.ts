@@ -64,7 +64,7 @@ export function useIncidenteDialogs(data: IncidentesData, options?: { celdaIdsPe
   const [evidencias, setEvidencias] = useState<File[]>([]);
   /* Las que ya están guardadas (al editar): cuentan para el máximo de tres y se muestran. */
   const [evidenciasExistentes, setEvidenciasExistentes] = useState<Evidencia[]>([]);
-  const [formTouched, setFormTouched] = useState<{ descripcion?: boolean; parqueaderoId?: boolean }>({});
+  const [formTouched, setFormTouched] = useState<{ descripcion?: boolean }>({});
 
   /* Validación en tiempo real. Un incidente hay que poder clasificarlo y ordenarlo, así que
      exige tipo y prioridad —y el detalle cuando el tipo es "otro"—; una novedad es una
@@ -73,7 +73,7 @@ export function useIncidenteDialogs(data: IncidentesData, options?: { celdaIdsPe
   const esNovedad = formData.clase === "novedad";
   const formErrors = {
     descripcion: formData.descripcion.trim() ? "" : "La descripción es obligatoria",
-    parqueaderoId: formData.parqueaderoId ? "" : "Selecciona un parqueadero",
+    vehiculoId: esNovedad || formData.vehiculoId ? "" : "Selecciona el vehículo implicado",
     tipoNovedad: esNovedad || formData.tipoNovedad ? "" : "Elige el tipo de incidente",
     tipoOtro: !esNovedad && formData.tipoNovedad === "otro" && !formData.tipoOtro.trim()
       ? "Indica de qué tipo de incidente se trata"
@@ -81,15 +81,12 @@ export function useIncidenteDialogs(data: IncidentesData, options?: { celdaIdsPe
     prioridad: esNovedad || formData.prioridad ? "" : "Elige la prioridad",
   };
   const formInvalido = Object.values(formErrors).some(Boolean);
-  const markTouched = (campo: "descripcion" | "parqueaderoId") =>
+  const markTouched = (campo: "descripcion") =>
     setFormTouched((t) => ({ ...t, [campo]: true }));
 
   const celdasDelParqueadero = useMemo(
-    () => celdas.filter((c) =>
-      c.parqueaderoId === formData.parqueaderoId &&
-      (!options?.celdaIdsPermitidas || options.celdaIdsPermitidas.has(c.id))
-    ),
-    [celdas, formData.parqueaderoId, options?.celdaIdsPermitidas]
+    () => celdas.filter((c) => !options?.celdaIdsPermitidas || options.celdaIdsPermitidas.has(c.id)),
+    [celdas, options?.celdaIdsPermitidas]
   );
   const ocupanteSeleccionado = ocupanteDeCelda(formData.celdaId);
 
@@ -145,16 +142,24 @@ export function useIncidenteDialogs(data: IncidentesData, options?: { celdaIdsPe
     resetForm();
   };
 
-  const handleParqueaderoChange = (parqueaderoId: string) => {
-    setFormData({ ...formData, parqueaderoId, celdaId: "" });
-  };
-
   const handleCeldaChange = (celdaId: string) => {
     const ocupante = ocupanteDeCelda(celdaId);
+    const celda = celdas.find((item) => item.id === celdaId);
     setFormData({
       ...formData,
+      parqueaderoId: celda?.parqueaderoId ?? "",
       celdaId,
-      vehiculoId: ocupante ? ocupante.vehiculo.id : formData.vehiculoId,
+      vehiculoId: ocupante ? ocupante.vehiculo.id : "",
+    });
+  };
+
+  const handleVehiculoChange = (vehiculoId: string) => {
+    const celda = celdas.find((item) => ocupanteDeCelda(item.id)?.vehiculo.id === vehiculoId);
+    setFormData({
+      ...formData,
+      vehiculoId,
+      celdaId: celda?.id ?? "",
+      parqueaderoId: celda?.parqueaderoId ?? "",
     });
   };
 
@@ -172,9 +177,9 @@ export function useIncidenteDialogs(data: IncidentesData, options?: { celdaIdsPe
     );
 
   const handleSave = async () => {
-    setFormTouched({ descripcion: true, parqueaderoId: true });
+    setFormTouched({ descripcion: true });
     if (formInvalido) {
-      toast.error("Descripción y Parqueadero son obligatorios");
+      toast.error("La descripción y el vehículo implicado son obligatorios");
       return;
     }
 
@@ -253,7 +258,7 @@ export function useIncidenteDialogs(data: IncidentesData, options?: { celdaIdsPe
     openEdit,
     openView,
     closeForm,
-    handleParqueaderoChange,
+    handleVehiculoChange,
     handleCeldaChange,
     handleSave,
     handleDelete,
