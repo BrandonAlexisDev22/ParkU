@@ -24,6 +24,7 @@ import {
 import type { Evidencia } from "@/services/api/evidencias";
 
 const C = theme;
+const API_BASE = (import.meta as any).env?.VITE_API_URL ?? "";
 
 interface IncidenteViewModalProps {
   incidente: Incidente;
@@ -46,7 +47,10 @@ interface IncidenteViewModalProps {
 function evidenciaUrl(ev: Evidencia): string {
   const e = ev as unknown as Record<string, unknown>;
   const v = e.url ?? e.archivoUrl ?? e.archivo ?? e.src ?? e.path ?? "";
-  return typeof v === "string" ? v : "";
+  if (typeof v !== "string" || !v.trim()) return "";
+  const url = v.trim();
+  if (/^(https?:|data:|blob:)/i.test(url)) return url;
+  return url.startsWith("/") ? `${API_BASE}${url}` : `${API_BASE}/${url}`;
 }
 
 /** Nombre legible de la evidencia, con fallback numerado. */
@@ -59,8 +63,9 @@ function evidenciaNombre(ev: Evidencia, i: number): string {
 /** Heurística para saber si la URL apunta a una imagen (o data URL de imagen). */
 function esImagen(url: string): boolean {
   if (!url) return false;
-  if (url.startsWith("data:image")) return true;
-  return /\.(jpe?g|png|gif|webp|bmp|svg|avif)(\?|#|$)/i.test(url);
+  // El endpoint de evidencias solo acepta imágenes, pero la URL puede ser una ruta
+  // sin extensión (por ejemplo, un recurso servido por el storage del backend).
+  return true;
 }
 
 /** Galería de evidencias: thumbnails cuadradas, con lightbox al hacer clic. */
