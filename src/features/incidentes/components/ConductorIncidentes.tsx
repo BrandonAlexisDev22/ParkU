@@ -3,6 +3,7 @@ import {
   IconPlus as Plus,
   IconShieldExclamation as ShieldAlert,
 } from "@tabler/icons-react";
+import { useMemo } from "react";
 import { Modal } from "@/components/shared";
 import { theme } from "@/styles/theme";
 import { useConductorIncidentesData } from "../hooks/useConductorIncidentesData";
@@ -21,7 +22,18 @@ const C = theme;
  */
 export function ConductorIncidentes() {
   const data = useConductorIncidentesData();
-  const dialogs = useIncidenteDialogs(data);
+  const celdasDelConductor = useMemo(
+    () => new Set(
+      data.celdas
+        .filter((celda) => {
+          const ocupante = data.ocupanteDeCelda(celda.id);
+          return ocupante && data.misVehiculos.some((vehiculo) => vehiculo.id === ocupante.vehiculo.id);
+        })
+        .map((celda) => celda.id),
+    ),
+    [data.celdas, data.misVehiculos, data.ocupanteDeCelda],
+  );
+  const dialogs = useIncidenteDialogs(data, { celdaIdsPermitidas: celdasDelConductor });
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -45,10 +57,13 @@ export function ConductorIncidentes() {
         </div>
         <button
           onClick={dialogs.openCreate}
+          disabled={celdasDelConductor.size === 0}
+          title={celdasDelConductor.size === 0 ? "No tienes un vehículo estacionado en una celda" : undefined}
           style={{
             display: "flex", alignItems: "center", gap: 8, padding: "10px 18px", borderRadius: 12,
-            border: "none", background: "#fff", color: C.primaryDark, fontSize: 13, fontWeight: 800,
-            cursor: "pointer", fontFamily: "inherit",
+            border: "none", background: celdasDelConductor.size === 0 ? "#E2E8F0" : "#fff",
+            color: celdasDelConductor.size === 0 ? C.textLight : C.primaryDark, fontSize: 13, fontWeight: 800,
+            cursor: celdasDelConductor.size === 0 ? "not-allowed" : "pointer", fontFamily: "inherit",
           }}
         >
           <Plus size={15} />Reportar incidente
@@ -113,6 +128,7 @@ export function ConductorIncidentes() {
           usuarios={[]}
           puedeClasificar={false}
           celdasDelParqueadero={dialogs.celdasDelParqueadero}
+          permitirSinCelda={false}
           celdaSeleccionada={data.celdaDe(dialogs.formData.celdaId)}
           ocupanteSeleccionado={dialogs.ocupanteSeleccionado}
           ocupanteDeCelda={data.ocupanteDeCelda}

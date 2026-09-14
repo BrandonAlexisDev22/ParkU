@@ -61,6 +61,7 @@ interface IncidenteFormModalProps {
    *  ver IncidenteVehiculoAsignadoFields. Por defecto true (Admin/Vigilante). */
   puedeClasificar?: boolean;
   celdasDelParqueadero: Celda[];
+  permitirSinCelda?: boolean;
   celdaSeleccionada: Celda | undefined;
   ocupanteSeleccionado: { vehiculo: { id: string; placa: string }; conductorNombre?: string } | null;
   ocupanteDeCelda: (celdaId?: string) => { vehiculo: { placa: string } } | null;
@@ -75,7 +76,7 @@ export function IncidenteFormModal({
   isEditing, usuariosReportantes, puedeRegistrarNovedades,
   evidencias, onEvidenciasChange, evidenciasExistentes, showJustificacionCierre,
   formData, setFormData, formTouched, formErrors, formInvalido, markTouched,
-  parqueaderos, vehiculos, usuarios, puedeClasificar = true, celdasDelParqueadero, celdaSeleccionada, ocupanteSeleccionado, ocupanteDeCelda,
+  parqueaderos, vehiculos, usuarios, puedeClasificar = true, celdasDelParqueadero, permitirSinCelda = true, celdaSeleccionada, ocupanteSeleccionado, ocupanteDeCelda,
   onParqueaderoChange, onCeldaChange, onClose, onSave,
 }: IncidenteFormModalProps) {
   return (
@@ -173,6 +174,7 @@ export function IncidenteFormModal({
             onParqueaderoBlur={() => markTouched("parqueaderoId")}
             onCeldaChange={onCeldaChange}
             ocupanteDeCelda={ocupanteDeCelda}
+            permitirSinCelda={permitirSinCelda}
           />
 
           {/* Una foto prueba lo que la descripción solo cuenta. Una novedad no las lleva:

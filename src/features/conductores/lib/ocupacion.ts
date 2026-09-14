@@ -22,7 +22,9 @@ const RESERVA_ESTADOS_ACTIVOS = new Set(["pendiente", "activa"]);
  * reserva y de ingreso, aunque en su ficha sí apareciera.
  */
 export function esDeConductor(vehiculo: Pick<Vehiculo, "conductorId" | "copropietarios">, conductorId: string): boolean {
-  return vehiculo.conductorId === conductorId || !!vehiculo.copropietarios?.some((p) => p.id === conductorId);
+  const idConductor = String(conductorId);
+  return String(vehiculo.conductorId) === idConductor ||
+    !!vehiculo.copropietarios?.some((p) => String(p.id) === idConductor);
 }
 
 /** Los vehículos que puede usar un conductor: los suyos y los que copropieta. */

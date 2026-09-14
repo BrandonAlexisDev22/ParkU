@@ -110,6 +110,12 @@ describe('qué vehículos son de un conductor', () => {
     expect(esDeConductor(conCopropietario, 'c3')).toBe(false);
   });
 
+  it('reconoce el vínculo aunque el ID del vehículo llegue como número', () => {
+    const vehiculoConIdNumerico = { ...vehiculo('10', 'NUM123'), conductorId: 2 } as unknown as Parameters<typeof esDeConductor>[0];
+
+    expect(esDeConductor(vehiculoConIdNumerico, '2')).toBe(true);
+  });
+
   it('la lista incluye los propios y los copropietados', () => {
     const flota = [vehiculo('1', 'ABC123', 'c2'), conCopropietario, vehiculo('3', 'JKL321', 'c3')];
     expect(vehiculosDeConductor(flota, 'c2').map((v) => v.placa)).toEqual(['ABC123', 'COP999']);

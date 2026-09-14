@@ -22,7 +22,7 @@ const emptyFormData = () => ({
 });
 
 /** Los tres modales de Incidentes: crear/editar (con su validación en vivo), ver detalle y confirmar eliminación. */
-export function useIncidenteDialogs(data: IncidentesData) {
+export function useIncidenteDialogs(data: IncidentesData, options?: { celdaIdsPermitidas?: Set<string> }) {
   const {
     celdas, incidentes, addIncidente, updateIncidente, deleteIncidente, ocupanteDeCelda,
     cambiarEstado, usuariosReportantes,
@@ -85,8 +85,11 @@ export function useIncidenteDialogs(data: IncidentesData) {
     setFormTouched((t) => ({ ...t, [campo]: true }));
 
   const celdasDelParqueadero = useMemo(
-    () => celdas.filter((c) => c.parqueaderoId === formData.parqueaderoId),
-    [celdas, formData.parqueaderoId]
+    () => celdas.filter((c) =>
+      c.parqueaderoId === formData.parqueaderoId &&
+      (!options?.celdaIdsPermitidas || options.celdaIdsPermitidas.has(c.id))
+    ),
+    [celdas, formData.parqueaderoId, options?.celdaIdsPermitidas]
   );
   const ocupanteSeleccionado = ocupanteDeCelda(formData.celdaId);
 
@@ -172,6 +175,14 @@ export function useIncidenteDialogs(data: IncidentesData) {
     setFormTouched({ descripcion: true, parqueaderoId: true });
     if (formInvalido) {
       toast.error("Descripción y Parqueadero son obligatorios");
+      return;
+    }
+
+    if (
+      options?.celdaIdsPermitidas &&
+      (!formData.celdaId || !options.celdaIdsPermitidas.has(formData.celdaId))
+    ) {
+      toast.error("Solo puedes reportar incidentes desde una celda donde esté uno de tus vehículos.");
       return;
     }
 

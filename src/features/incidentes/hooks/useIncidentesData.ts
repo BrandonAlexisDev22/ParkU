@@ -34,10 +34,9 @@ export function useIncidentesData(options?: UseIncidentesDataOptions) {
   const { data: celdas = [] } = useCeldas();
   const { data: vehiculos = [] } = useVehiculos();
   const { data: conductores = [] } = useConductores();
-  // Solo Admin/Vigilante pueden listar /api/entradas-salidas — 403 en vivo para Comunidad SENA;
-  // solo se usa más abajo para "quién ocupa esta celda ahora", una vista de gestión que ese rol
-  // no tiene en su pantalla de incidentes.
-  const { data: controlesSalida = [] } = useControlSalida({ enabled: !esConductor });
+  // También se usa en la vista del conductor para identificar las celdas donde están
+  // estacionados sus propios vehículos.
+  const { data: controlesSalida = [] } = useControlSalida();
   // Solo Admin puede listar /api/usuarios — para Vigilante/Conductor queda deshabilitada (antes
   // solo quedaba en [] tras un 403 real; ahora que las lecturas fallidas sí avisan globalmente,
   // desactivarla evita ese toast para dos roles que nunca iban a poder verla).
