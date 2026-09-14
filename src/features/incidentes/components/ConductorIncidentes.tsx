@@ -123,7 +123,6 @@ export function ConductorIncidentes() {
           formErrors={dialogs.formErrors}
           formInvalido={dialogs.formInvalido}
           markTouched={dialogs.markTouched}
-          parqueaderos={data.parqueaderos}
           vehiculos={data.misVehiculos}
           usuarios={[]}
           puedeClasificar={false}
@@ -132,8 +131,8 @@ export function ConductorIncidentes() {
           celdaSeleccionada={data.celdaDe(dialogs.formData.celdaId)}
           ocupanteSeleccionado={dialogs.ocupanteSeleccionado}
           ocupanteDeCelda={data.ocupanteDeCelda}
-          onParqueaderoChange={dialogs.handleParqueaderoChange}
           onCeldaChange={dialogs.handleCeldaChange}
+          onVehiculoChange={dialogs.handleVehiculoChange}
           onClose={dialogs.closeForm}
           onSave={dialogs.handleSave}
         />

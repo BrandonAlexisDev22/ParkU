@@ -1,5 +1,4 @@
 import { IconSparkles as Sparkles, IconX as X } from "@tabler/icons-react";
-import type { Parqueadero } from "@/services/api/parqueaderos";
 import type { Vehiculo } from "@/services/api/vehiculos";
 import type { Usuario } from "@/services/api/usuarios";
 import type { Celda } from "@/services/api/celdas";
@@ -50,11 +49,9 @@ interface IncidenteFormModalProps {
   showJustificacionCierre: boolean;
   formData: IncidenteFormData;
   setFormData: (updater: (f: IncidenteFormData) => IncidenteFormData) => void;
-  formTouched: { descripcion?: boolean; parqueaderoId?: boolean };
-  formErrors: { descripcion: string; parqueaderoId: string };
+  formTouched: { descripcion?: boolean };
+  formErrors: { descripcion: string; vehiculoId: string };
   formInvalido: boolean;
-  markTouched: (campo: "descripcion" | "parqueaderoId") => void;
-  parqueaderos: Parqueadero[];
   vehiculos: Vehiculo[];
   usuarios: Usuario[];
   /** false para el flujo de Comunidad SENA (solo reporta): oculta prioridad y "Asignar a" —
@@ -65,8 +62,8 @@ interface IncidenteFormModalProps {
   celdaSeleccionada: Celda | undefined;
   ocupanteSeleccionado: { vehiculo: { id: string; placa: string }; conductorNombre?: string } | null;
   ocupanteDeCelda: (celdaId?: string) => { vehiculo: { placa: string } } | null;
-  onParqueaderoChange: (value: string) => void;
   onCeldaChange: (value: string) => void;
+  onVehiculoChange: (value: string) => void;
   onClose: () => void;
   onSave: () => void;
 }
@@ -76,8 +73,8 @@ export function IncidenteFormModal({
   isEditing, usuariosReportantes, puedeRegistrarNovedades,
   evidencias, onEvidenciasChange, evidenciasExistentes, showJustificacionCierre,
   formData, setFormData, formTouched, formErrors, formInvalido, markTouched,
-  parqueaderos, vehiculos, usuarios, puedeClasificar = true, celdasDelParqueadero, permitirSinCelda = true, celdaSeleccionada, ocupanteSeleccionado, ocupanteDeCelda,
-  onParqueaderoChange, onCeldaChange, onClose, onSave,
+  vehiculos, usuarios, puedeClasificar = true, celdasDelParqueadero, permitirSinCelda = true, celdaSeleccionada, ocupanteSeleccionado, ocupanteDeCelda,
+  onCeldaChange, onVehiculoChange, onClose, onSave,
 }: IncidenteFormModalProps) {
   return (
     <div>
@@ -160,18 +157,13 @@ export function IncidenteFormModal({
 
           <IncidenteBasicFields
             descripcion={formData.descripcion}
-            parqueaderoId={formData.parqueaderoId}
             celdaId={formData.celdaId}
-            parqueaderos={parqueaderos}
             celdasDelParqueadero={celdasDelParqueadero}
             celdaSeleccionada={celdaSeleccionada}
             ocupanteSeleccionado={ocupanteSeleccionado}
             descripcionError={formTouched.descripcion ? formErrors.descripcion : undefined}
-            parqueaderoError={formTouched.parqueaderoId ? formErrors.parqueaderoId : undefined}
             onDescripcionChange={(value) => setFormData((f) => ({ ...f, descripcion: value }))}
             onDescripcionBlur={() => markTouched("descripcion")}
-            onParqueaderoChange={onParqueaderoChange}
-            onParqueaderoBlur={() => markTouched("parqueaderoId")}
             onCeldaChange={onCeldaChange}
             ocupanteDeCelda={ocupanteDeCelda}
             permitirSinCelda={permitirSinCelda}
@@ -189,6 +181,7 @@ export function IncidenteFormModal({
 
           <IncidenteVehiculoAsignadoFields
             vehiculoId={formData.vehiculoId}
+            vehiculoError={formData.clase !== "novedad" && formTouched.descripcion ? formErrors.vehiculoId : undefined}
             usuarioAsignadoId={formData.usuarioAsignadoId}
             tipoNovedad={formData.tipoNovedad}
             tipoOtro={formData.tipoOtro}
@@ -199,7 +192,7 @@ export function IncidenteFormModal({
             puedeClasificar={puedeClasificar}
             showJustificacionCierre={showJustificacionCierre}
             justificacionCierre={formData.justificacionCierre}
-            onVehiculoChange={(value) => setFormData((f) => ({ ...f, vehiculoId: value }))}
+            onVehiculoChange={onVehiculoChange}
             onUsuarioAsignadoChange={(value) => setFormData((f) => ({ ...f, usuarioAsignadoId: value }))}
             onTipoNovedadChange={(value) => setFormData((f) => ({ ...f, tipoNovedad: value }))}
             onPrioridadChange={(value) => setFormData((f) => ({ ...f, prioridad: value }))}

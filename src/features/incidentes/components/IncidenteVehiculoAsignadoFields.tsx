@@ -14,6 +14,7 @@ const selectStyle = {
 
 interface IncidenteVehiculoAsignadoFieldsProps {
   vehiculoId: string;
+  vehiculoError?: string;
   usuarioAsignadoId: string;
   tipoNovedad: TipoNovedad;
   /** En qué consiste, cuando el tipo es "otro": guardarlo sin poder escribirlo lo volvía inútil. */
@@ -38,7 +39,7 @@ interface IncidenteVehiculoAsignadoFieldsProps {
 
 /** Campos tipo/prioridad, vehículo, asignar a (solo Admin), y justificación de cierre. */
 export function IncidenteVehiculoAsignadoFields({
-  vehiculoId, usuarioAsignadoId, tipoNovedad, tipoOtro, onTipoOtroChange, prioridad, vehiculos, usuarios, puedeClasificar = true,
+  vehiculoId, vehiculoError, usuarioAsignadoId, tipoNovedad, tipoOtro, onTipoOtroChange, prioridad, vehiculos, usuarios, puedeClasificar = true,
   showJustificacionCierre, justificacionCierre,
   onVehiculoChange, onUsuarioAsignadoChange, onTipoNovedadChange, onPrioridadChange, onJustificacionCierreChange,
 }: IncidenteVehiculoAsignadoFieldsProps) {
@@ -85,7 +86,7 @@ export function IncidenteVehiculoAsignadoFields({
       {/* Buscable: la flota entera en un desplegable obligaba a recorrer cientos de placas. */}
       <SelectorBuscable
         id="vehiculo"
-        label="Vehículo (opcional)"
+        label="Vehículo estacionado *"
         opciones={opcionesDeVehiculo(vehiculos)}
         valor={vehiculoId}
         onChange={onVehiculoChange}
@@ -94,7 +95,8 @@ export function IncidenteVehiculoAsignadoFields({
         placeholder="Escribe la placa o el nombre del dueño…"
         textoVacio="Ningún vehículo coincide"
         textoSinSeleccion="Ninguno"
-        ayuda="Si seleccionas una celda ocupada, el vehículo se sugiere automáticamente."
+        error={vehiculoError}
+        ayuda="El parqueadero y la celda se toman automáticamente de su ubicación actual."
       />
 
       {!puedeClasificar && (
