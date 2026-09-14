@@ -23,6 +23,7 @@ interface IncidenteBasicFieldsProps {
   onParqueaderoBlur: () => void;
   onCeldaChange: (value: string) => void;
   ocupanteDeCelda: (celdaId?: string) => { vehiculo: { placa: string } } | null;
+  permitirSinCelda?: boolean;
 }
 
 /** Campos descripción + parqueadero + celda del formulario de incidente. */
@@ -30,6 +31,7 @@ export function IncidenteBasicFields({
   descripcion, parqueaderoId, celdaId, parqueaderos, celdasDelParqueadero,
   celdaSeleccionada, ocupanteSeleccionado, descripcionError, parqueaderoError,
   onDescripcionChange, onDescripcionBlur, onParqueaderoChange, onParqueaderoBlur, onCeldaChange, ocupanteDeCelda,
+  permitirSinCelda = true,
 }: IncidenteBasicFieldsProps) {
   return (
     <>
@@ -87,7 +89,7 @@ export function IncidenteBasicFields({
           deshabilitado={!parqueaderoId || celdasDelParqueadero.length === 0}
           placeholder="Buscar por número de celda…"
           textoVacio={parqueaderoId ? "Ninguna celda coincide" : "Elige un parqueadero primero"}
-          textoSinSeleccion="Sin celda específica"
+          textoSinSeleccion={permitirSinCelda ? "Sin celda específica" : undefined}
         />
       </div>
 

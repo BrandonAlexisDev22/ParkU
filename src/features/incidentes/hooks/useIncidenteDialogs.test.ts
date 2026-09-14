@@ -108,3 +108,27 @@ describe('useIncidenteDialogs — bloqueo de incidente duplicado al crear', () =
     expect(toast.error).not.toHaveBeenCalled();
   });
 });
+
+describe('useIncidenteDialogs — celdas permitidas para el conductor', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('rechaza guardar un incidente en una celda fuera de la flota permitida', async () => {
+    const data = buildData({
+      celdas: [
+        { id: '5', parqueaderoId: '1' },
+        { id: '6', parqueaderoId: '1' },
+      ],
+    });
+    const { result } = renderHook(() => useIncidenteDialogs(data, {
+      celdaIdsPermitidas: new Set(['5']),
+    }));
+
+    act(() => result.current.openCreate());
+    llenarForm(result, { celdaId: '6' });
+
+    await act(async () => { await result.current.handleSave(); });
+
+    expect(data.addIncidente).not.toHaveBeenCalled();
+    expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('Solo puedes reportar'));
+  });
+});
