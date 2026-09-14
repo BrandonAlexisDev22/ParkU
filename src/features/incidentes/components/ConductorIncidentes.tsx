@@ -38,7 +38,7 @@ export function ConductorIncidentes() {
           </div>
           <div>
             <h1 style={{ fontSize: 18, fontWeight: 900, margin: 0 }}>Mis incidentes</h1>
-            <p style={{ fontSize: 12, opacity: 0.85, margin: "2px 0 0" }}>
+            <p style={{ fontSize: 12, color: "#fff", margin: "2px 0 0" }}>
               {data.misIncidentes.length} reportado{data.misIncidentes.length !== 1 ? "s" : ""}
             </p>
           </div>
