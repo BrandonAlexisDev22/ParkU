@@ -30,13 +30,14 @@ describe('permisosDeVistas — de permisos del backend a pantallas', () => {
     expect(permisosDeVistas(ROL_A_MEDIDA, ['parqueaderos.consultar']).parqueaderos).toBe(true);
   });
 
-  it('consultar ingresos NO abre la pantalla donde se estaciona', () => {
+  it('consultar ingresos NO abre la pantalla donde se estaciona para un rol a medida', () => {
     // Esa pantalla no es un listado: es donde se registra la entrada y la salida de un
     // vehículo. Abrirla con un permiso de solo consulta le ponía el botón "Estacionar" a un
-    // Conductor, que es justo lo que no debe poder hacer.
+    // Conductor, que es justo lo que no debe poder hacer, pero el rol Conductor tiene acceso
+    // normal a la pantalla por su matriz específica.
     expect(permisosDeVistas(ROL_A_MEDIDA, ['ingreso.consultar']).entradaSalida).toBe(false);
     expect(permisosDeVistas(ROL_A_MEDIDA, ['salida.consultar']).entradaSalida).toBe(false);
-    expect(permisosDeVistas(ROLES.CONDUCTOR, ['ingreso.consultar', 'reservas.consultar']).entradaSalida).toBe(false);
+    expect(permisosDeVistas(ROLES.CONDUCTOR, ['ingreso.consultar', 'reservas.consultar']).entradaSalida).toBe(true);
   });
 
   it('los permisos de gestión abren también lo que esa pantalla necesita para actuar', () => {
@@ -75,6 +76,7 @@ describe('permisosDeVistas — de permisos del backend a pantallas', () => {
     // tenían por no estar en `rol_permiso` los dejaría sin pantallas que sí pueden usar.
     const conductor = permisosDeVistas(ROLES.CONDUCTOR, []);
     expect(conductor).toEqual(PERMISOS_POR_ROL[ROLES.CONDUCTOR]);
+    expect(conductor.entradaSalida).toBe(true);
     expect(conductor.incidentes).toBe(true);
 
     const conUsuarios = permisosDeVistas(ROLES.CONDUCTOR, ['usuarios.consultar']);

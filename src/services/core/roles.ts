@@ -86,14 +86,13 @@ export const PERMISOS_POR_ROL: Record<RolId, PermisosRol> = {
     conductores: false,
     vehiculos: false,
     // Solo lectura del mapa/disponibilidad de celdas + reservar una: ve la sección de
-    // Parqueaderos, pero sin `celdas`/`asignaciones`/`entradaSalida` no puede crear/editar
-    // parqueaderos, registrar ingresos/egresos ni usar asignación inteligente (esas acciones
-    // están gateadas en la UI por esos permisos, no por este). Ver ParqueaderosPage.tsx /
-    // CeldaInfoModal.tsx.
+    // Parqueaderos, pero sin `celdas`/`asignaciones` no puede crear/editar parqueaderos ni
+    // usar asignación inteligente. Sí puede abrir la pantalla de Entrada/Salida porque ese
+    // flujo es donde consulta su propio acceso a la sede y registra su estado de ingreso/salida.
     parqueaderos: true,
     celdas: false,
     asignaciones: false,
-    entradaSalida: false,
+    entradaSalida: true,
     reservas: true,
     // El conductor puede consultar y reportar incidentes de su propia operación dentro de la
     // aplicación, y también ver la vista de incidentes para gestionar su caso o novedad.

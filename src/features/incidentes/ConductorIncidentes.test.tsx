@@ -56,38 +56,27 @@ function renderComoComunidadSena() {
 }
 
 describe("features/incidentes — ConductorIncidentes (rol Comunidad SENA)", () => {
-  it("bloquea el acceso a incidentes del parqueadero para el conductor", async () => {
+  it("muestra la vista propia de incidentes del conductor", async () => {
     renderComoComunidadSena();
 
+    expect(await screen.findByText("Mis incidentes")).toBeInTheDocument();
     expect(
-      await screen.findByText(
-        "No tienes permisos para consultar incidentes del parqueadero.",
-      ),
+      screen.getByRole("button", { name: /Reportar incidente/i }),
     ).toBeInTheDocument();
-    expect(
-      screen.queryByRole("button", { name: /Reportar incidente/i }),
-    ).not.toBeInTheDocument();
-    expect(screen.queryByText("Mis incidentes")).not.toBeInTheDocument();
   });
 
-  it("no ofrece el flujo de creación de incidentes aunque la pantalla se abra por URL directa", async () => {
+  it("permite abrir el formulario de creación desde la vista del conductor", async () => {
     const user = userEvent.setup();
     renderComoComunidadSena();
 
-    expect(
-      await screen.findByText(
-        "No tienes permisos para consultar incidentes del parqueadero.",
-      ),
-    ).toBeInTheDocument();
+    expect(await screen.findByText("Mis incidentes")).toBeInTheDocument();
     await user.click(
-      screen.getByText(
-        "No tienes permisos para consultar incidentes del parqueadero.",
-      ),
+      screen.getByRole("button", { name: /Reportar incidente/i }),
     );
 
     expect(
-      screen.queryByRole("heading", { level: 2, name: "Nuevo Incidente" }),
-    ).not.toBeInTheDocument();
+      screen.getByRole("heading", { level: 2, name: /Nuevo Incidente/i }),
+    ).toBeInTheDocument();
   });
 });
 
@@ -96,22 +85,15 @@ describe("features/incidentes — ConductorIncidentes con el 403 real simulado (
     apiFetchMock.mockImplementation(createAppBackends().apiFetch);
   });
 
-  it("no permite ni siquiera abrir el formulario aunque el backend simule un 403 para el rol conductor", async () => {
+  it("sigue mostrando la vista propia del conductor aunque el backend simule un 403 para el listado general", async () => {
     apiFetchMock.mockImplementation(
       createAppBackends({ rolActual: ROLES.CONDUCTOR }).apiFetch,
     );
     renderComoComunidadSena();
 
+    expect(await screen.findByText("Mis incidentes")).toBeInTheDocument();
     expect(
-      await screen.findByText(
-        "No tienes permisos para consultar incidentes del parqueadero.",
-      ),
+      screen.getByRole("button", { name: /Reportar incidente/i }),
     ).toBeInTheDocument();
-    expect(
-      screen.queryByRole("button", { name: /Reportar incidente/i }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole("heading", { level: 2, name: "Nuevo Incidente" }),
-    ).not.toBeInTheDocument();
   });
 });

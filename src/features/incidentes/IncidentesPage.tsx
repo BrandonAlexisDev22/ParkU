@@ -20,25 +20,10 @@ export function Incidentes() {
   const { user } = useAuth();
   const p = useIncidentesPage();
 
-  // El rol Comunidad SENA (Conductor) ya no reporta incidentes del parqueadero: solo puede
-  // gestionar su acceso propio (entrada/salida). Si llega a esta ruta por una URL directa,
-  // se bloquea para evitar que se reabra el flujo de incidentes del establecimiento.
+  // El rol Comunidad SENA (Conductor) no ve el panel completo del parqueadero, sino su
+  // propio historial de incidentes y la opción de reportar uno asociado a sus vehículos.
   if (user?.rol === ROLES.CONDUCTOR) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: 200,
-          padding: 24,
-          color: C.textLight,
-          fontWeight: 600,
-        }}
-      >
-        No tienes permisos para consultar incidentes del parqueadero.
-      </div>
-    );
+    return <ConductorIncidentes />;
   }
 
   return (
