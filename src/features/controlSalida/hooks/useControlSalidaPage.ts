@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useControlSalida, useUpdateControlSalida } from "./useControlSalida";
 import type { ControlSalida } from "@/services/api/controlSalida";
-import { useVehiculos, useConductores } from "@/features/conductores";
+import { useVehiculos, useConductores, vehiculosDeConductor } from "@/features/conductores";
 import { useCeldas, useParqueaderos, useUpdateCelda, useIncidenteReporte } from "@/features/parqueaderos";
 import { useCreateIncidente } from "@/features/incidentes";
 import type { Incidente } from "@/services/api/incidentes";
@@ -14,6 +14,8 @@ import { PAGE_SIZE } from "../lib/helpers";
 
 /** Datos, filtros, paginación y eliminación del historial de entrada/salida. */
 export function useControlSalidaPage() {
+  const { user } = useAuth();
+  const esConductor = user?.rol === ROLES.CONDUCTOR;
   const { data: controlesSalida = [], isLoading } = useControlSalida();
   const { data: vehiculos = [] } = useVehiculos();
   const { data: celdas = [] } = useCeldas();
@@ -21,6 +23,19 @@ export function useControlSalidaPage() {
   const { data: parqueaderos = [] } = useParqueaderos();
   const updateControlSalidaMutation = useUpdateControlSalida();
   const updateCeldaMutation = useUpdateCelda();
+
+  const miConductorId = useMemo(
+    () => (esConductor ? conductores.find((c) => c.usuarioId === user!.id)?.id ?? null : null),
+    [esConductor, conductores, user],
+  );
+  const misVehiculosIds = useMemo(
+    () => (esConductor ? vehiculosDeConductor(vehiculos, miConductorId).map((v) => v.id) : []),
+    [esConductor, vehiculos, miConductorId],
+  );
+  const controlesVisibles = useMemo(
+    () => (esConductor ? controlesSalida.filter((control) => misVehiculosIds.includes(control.vehiculoId)) : controlesSalida),
+    [esConductor, controlesSalida, misVehiculosIds],
+  );
   // `mutateAsync` (no `.mutate`): quien llama necesita el `await`/try-catch para no
   // mostrar un toast de "éxito" cuando la mutación en realidad falla.
 
@@ -28,7 +43,6 @@ export function useControlSalidaPage() {
   const [filterEstado, setFilterEstado] = useState<"todos" | "en_parqueadero" | "finalizado">("todos");
   const [filterParqueadero, setFilterParqueadero] = useState<string>("todos");
   const [page, setPage] = useState(1);
-
 
   const getVehiculo = useCallback((vehiculoId: string) => vehiculos.find((v) => v.id === vehiculoId), [vehiculos]);
   const getCelda = useCallback((celdaId: string) => celdas.find((c) => c.id === celdaId), [celdas]);
@@ -49,12 +63,12 @@ export function useControlSalidaPage() {
 
   // Celdas disponibles (sin filtrar por tipo)
   const celdasDisponibles = useMemo(() => celdas.filter((c) => c.estado === "disponible"), [celdas]);
-  const vehiculosEnParqueadero = useMemo(() => controlesSalida.filter((c) => c.estado === "en_parqueadero"), [controlesSalida]);
-  const vehiculosSalidos = useMemo(() => controlesSalida.filter((c) => c.estado === "finalizado"), [controlesSalida]);
+  const vehiculosEnParqueadero = useMemo(() => controlesVisibles.filter((c) => c.estado === "en_parqueadero"), [controlesVisibles]);
+  const vehiculosSalidos = useMemo(() => controlesVisibles.filter((c) => c.estado === "finalizado"), [controlesVisibles]);
 
   const filteredControles = useMemo(
     () =>
-      controlesSalida
+      controlesVisibles
         .filter((control) => {
           const vehiculo = getVehiculo(control.vehiculoId);
           const celda = getCelda(control.celdaId);
@@ -84,7 +98,7 @@ export function useControlSalidaPage() {
           if (!salidaB) return 1;
           return new Date(salidaB).getTime() - new Date(salidaA).getTime();
         }),
-    [controlesSalida, search, filterEstado, filterParqueadero, getVehiculo, getCelda, getUsuarioConductor, getParqueadero]
+    [controlesVisibles, search, filterEstado, filterParqueadero, getVehiculo, getCelda, getUsuarioConductor, getParqueadero]
   );
 
   useEffect(() => {
@@ -108,7 +122,6 @@ export function useControlSalidaPage() {
 
   /* Quién puede figurar como autor del reporte: quien lo escribe. Solo un Administrador
      puede ponerlo a nombre de otra persona (ver useParqueaderosData). */
-  const { user } = useAuth();
   /* Leer el listado de usuarios es cosa de Administrador y Vigilante: el vigilante lo
      necesita para saber quién levantó un incidente y para dejar un reporte a nombre de quien
      se lo comunica (GET /usuarios, ver usuario.routes.js). Crear o editar cuentas sigue
@@ -181,7 +194,7 @@ export function useControlSalidaPage() {
   const hasActiveFilters = !!search || filterEstado !== "todos" || filterParqueadero !== "todos";
 
   return {
-    controlesSalida, parqueaderos,
+    controlesSalida: controlesVisibles, parqueaderos,
     search, setSearch, filterEstado, setFilterEstado, filterParqueadero, setFilterParqueadero,
     getVehiculo, getCelda, getParqueadero, getUsuarioConductor,
     celdasDisponibles, vehiculosEnParqueadero, vehiculosSalidos,
