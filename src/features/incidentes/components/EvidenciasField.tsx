@@ -15,35 +15,9 @@ import {
   motivoArchivoInvalido,
   type Evidencia,
 } from "@/services/api/evidencias";
+import { EvidenciaImg } from "./EvidenciaImg";
 
 const C = theme;
-
-/**
- * Define VITE_API_URL en tu .env si el backend sirve archivos desde otro host.
- *
- * Ejemplo:
- * VITE_API_URL=http://localhost:8000
- *
- * Sin barra final.
- */
-const API_BASE = (import.meta as any).env?.VITE_API_URL ?? "";
-
-/**
- * Resuelve URLs relativas y absolutas de evidencias.
- */
-function resolverUrl(url: string): string {
-  if (!url) return "";
-
-  if (/^(https?:|data:|blob:)/i.test(url)) {
-    return url;
-  }
-
-  if (url.startsWith("/")) {
-    return `${API_BASE}${url}`;
-  }
-
-  return `${API_BASE}/${url}`;
-}
 
 /**
  * Nombre visible:
@@ -53,50 +27,6 @@ function nombreDe(ev: Evidencia, i: number): string {
   const descripcion = (ev.descripcion ?? "").trim();
 
   return descripcion || `Evidencia ${i + 1}`;
-}
-
-/**
- * Carga la evidencia.
- *
- * Actualmente utiliza directamente la URL.
- *
- * Esto permite que posteriormente podamos reemplazarlo
- * por un fetch autenticado si el backend requiere token.
- */
-function useEvidenciaSrc(url: string): {
-  src: string | null;
-  error: boolean;
-  cargando: boolean;
-} {
-  const [src, setSrc] = useState<string | null>(null);
-  const [error, setError] = useState(false);
-  const [cargando, setCargando] = useState(true);
-
-  useEffect(() => {
-    if (!url) {
-      setSrc(null);
-      setCargando(false);
-      setError(true);
-      return;
-    }
-
-    if (/^(data:|blob:)/i.test(url)) {
-      setSrc(url);
-      setCargando(false);
-      setError(false);
-      return;
-    }
-
-    setSrc(url);
-    setCargando(false);
-    setError(false);
-  }, [url]);
-
-  return {
-    src,
-    error,
-    cargando,
-  };
 }
 
 /* ============================================================
@@ -519,41 +449,26 @@ function EvidenciaThumb({
 }: {
   evidencia: Evidencia;
   indice: number;
-  onPreview: (
-    url: string,
-    nombre: string
-  ) => void;
+  onPreview: (url: string, nombre: string) => void;
 }) {
-  const urlOriginal =
-    (evidencia.url ?? "").trim();
+  const urlOriginal = (evidencia.url ?? "").trim();
+  const nombre = nombreDe(evidencia, indice);
 
-  const url =
-    resolverUrl(urlOriginal);
+  // `EvidenciaImg` prueba las URLs candidatas (origen del servidor y, si falla, base de la
+  // API); aquí solo hace falta saber si alguna cargó, para abrir la vista ampliada con esa.
+  const [cargada, setCargada] = useState<string | null>(null);
+  const [fallo, setFallo] = useState(false);
 
-  const nombre =
-    nombreDe(evidencia, indice);
-
-  const {
-    src,
-    error,
-    cargando,
-  } = useEvidenciaSrc(url);
+  useEffect(() => {
+    setCargada(null);
+    setFallo(false);
+  }, [urlOriginal]);
 
   return (
     <button
       type="button"
-      onClick={() =>
-        src &&
-        onPreview(
-          src,
-          nombre
-        )
-      }
-      title={
-        urlOriginal
-          ? `URL: ${urlOriginal}`
-          : "Sin URL en la respuesta"
-      }
+      onClick={() => cargada && onPreview(cargada, nombre)}
+      title={urlOriginal ? `URL: ${urlOriginal}` : "Sin URL en la respuesta"}
       aria-label={`Ver ${nombre}`}
       style={{
         position: "relative",
@@ -564,41 +479,21 @@ function EvidenciaThumb({
         border: `1px solid ${C.border}`,
         background: C.surfaceSubtle,
         padding: 0,
-        cursor: src
-          ? "zoom-in"
-          : "default",
+        cursor: cargada ? "zoom-in" : "default",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
       }}
     >
-      {/* ====================================================
-          IMAGEN EXISTENTE
-          ==================================================== */}
-
-      {src ? (
-        <img
-          src={src}
+      {urlOriginal && !fallo ? (
+        <EvidenciaImg
+          url={urlOriginal}
           alt={nombre}
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            display: "block",
-          }}
-          onError={() => {
-            // El error visual lo maneja el fallback.
-          }}
+          loading="lazy"
+          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+          onCargada={setCargada}
+          onFallo={() => setFallo(true)}
         />
-      ) : cargando ? (
-        <span
-          style={{
-            fontSize: 10,
-            color: C.textLight,
-          }}
-        >
-          Cargando…
-        </span>
       ) : (
         <div
           style={{
@@ -615,18 +510,8 @@ function EvidenciaThumb({
           }}
         >
           <PhotoOff size={22} />
-
-          <span
-            style={{
-              wordBreak: "break-word",
-              maxWidth: "100%",
-            }}
-          >
-            {!urlOriginal
-              ? "Sin URL"
-              : error
-              ? "No se pudo cargar"
-              : "Error"}
+          <span style={{ wordBreak: "break-word", maxWidth: "100%" }}>
+            {!urlOriginal ? "Sin URL" : "No se pudo cargar"}
           </span>
         </div>
       )}

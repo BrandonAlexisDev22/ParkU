@@ -22,9 +22,10 @@ import {
   TIPO_NOVEDAD_LABEL,
 } from "../lib/constants";
 import type { Evidencia } from "@/services/api/evidencias";
+import { resolverUrlArchivo } from "@/services/core/archivos";
+import { EvidenciaImg } from "./EvidenciaImg";
 
 const C = theme;
-const API_BASE = (import.meta as any).env?.VITE_API_URL ?? "";
 
 interface IncidenteViewModalProps {
   incidente: Incidente;
@@ -44,13 +45,12 @@ interface IncidenteViewModalProps {
 }
 
 /** Extrae la URL de una evidencia sin depender del nombre exacto del campo en el modelo. */
+/** URL de la evidencia tal como la devuelve la API; la resolución final la hace
+ *  `candidatosUrlArchivo` (origen del servidor, y base de la API como respaldo). */
 function evidenciaUrl(ev: Evidencia): string {
   const e = ev as unknown as Record<string, unknown>;
   const v = e.url ?? e.archivoUrl ?? e.archivo ?? e.src ?? e.path ?? "";
-  if (typeof v !== "string" || !v.trim()) return "";
-  const url = v.trim();
-  if (/^(https?:|data:|blob:)/i.test(url)) return url;
-  return url.startsWith("/") ? `${API_BASE}${url}` : `${API_BASE}/${url}`;
+  return typeof v === "string" ? v.trim() : "";
 }
 
 /** Nombre legible de la evidencia, con fallback numerado. */
@@ -113,8 +113,8 @@ function EvidenciaGallery({ evidencias }: { evidencias: Evidencia[] }) {
               }}
             >
               {esImg ? (
-                <img
-                  src={url}
+                <EvidenciaImg
+                  url={url}
                   alt={nombre}
                   loading="lazy"
                   style={{
@@ -167,8 +167,8 @@ function EvidenciaGallery({ evidencias }: { evidencias: Evidencia[] }) {
             cursor: "zoom-out",
           }}
         >
-          <img
-            src={preview.url}
+          <EvidenciaImg
+            url={preview.url}
             alt={preview.nombre}
             onClick={(e) => e.stopPropagation()}
             style={{
